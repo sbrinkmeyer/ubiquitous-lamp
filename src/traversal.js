@@ -1,4 +1,5 @@
 const { error } = require("console");
+
 const fs = require("fs/promises");
 const path = require("path");
 
@@ -14,11 +15,11 @@ async function traverseDirectory(dir, onFile, onFolder) {
                 // recursively traverser subdirectories
                 await traverseDirectory(fullPath, onFile, onFolder);
             } else if (item.isFile()) {
-                if (onFile) onFile(fullPath);
+                if (onFile) await onFile(fullPath);
             }
         }
     } catch (error){
-        console.error('Error readin directory "${dir}": ', error.messages);
+        console.error('Error reading directory "${dir}": ', error.messages);
     }    
 }
 

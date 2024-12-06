@@ -1,24 +1,35 @@
 require("dotenv").config();
 
 const {traverseDirectory} = require("./src/traversal");
+const {getVidProps} = require("./src/vidprops");
 
-const MOVIE_DIR = process.env.MOVIE_DIR;
+const movieRoot = process.env.MOVIE_DIR;
 
 // verify the required
-if (!MOVIE_DIR){
+if (!movieRoot){
     console.error("missing required environment var: MOVIE_DIR");
     process.exit(1);
 }
 
-// test output
-console.log("movies path: ", MOVIE_DIR);
+async function processFile(filePath) {
+    try {
+        if(filePath.endsWith('.mp4') || filePath.endsWith('.mkv')) {
+            console.log(`📄 Analyzing: ${filePath}`);
+            const details = await getVidProps(filePath);
+            console.log(`✅ Details for ${filePath}: `, details);
+        }
+    } catch (error) {
+        console.error(`❌ Failed to analyze ${filePath}: `, error.message);
+    }
+    
+}
 
 (async function main() {
-    console.log('starting directory traverse for: ${MOVIE_DIR}');
+    console.log(`starting directory traverse for: ${movieRoot}`);
     await traverseDirectory(
-        MOVIE_DIR,
-        (filePath) => console.log("📄 File:", filePath),
-        (folderPath) => console.log("\uD83D\uDCC1 Folder: ", folderPath)
+        movieRoot,
+        (filePath) => processFile(filePath),
+        (folderPath) => console.log("📁 Folder: ", folderPath)
     );
     console.log("finished directory traversal");
 })();
